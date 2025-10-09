@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CardioAging - Cardiovascular Health for Older Adults</title>
+  <meta name="description" content="Evidence-based cardiovascular health tools for adults 65+ and caregivers." />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeIn .5s ease-out}
+    html{scroll-behavior:smooth}
+    @media print{.no-print{display:none!important} body{font-size:12pt}}
+    *{transition:background-color .3s ease,color .3s ease}
+    ::-webkit-scrollbar{width:10px}
+    ::-webkit-scrollbar-track{background:#f1f1f1}
+    ::-webkit-scrollbar-thumb{background:#888;border-radius:5px}
+    ::-webkit-scrollbar-thumb:hover{background:#555}
+    .dark ::-webkit-scrollbar-track{background:#1f1f1f}
+    .dark ::-webkit-scrollbar-thumb{background:#4a4a4a}
+    [x-cloak]{display:none!important}
+  </style>
+</head>
+<body>
+<div x-data="cardioAgingApp()" x-init="init()" :class="{ 'dark': darkMode, 'text-lg': largeText }" class="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+
+  <!-- Nav -->
+  <nav class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-zinc-800 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-2">
+          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+          <span class="font-bold text-xl tracking-tight">CardioAging</span>
+        </div>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="#tools" class="hover:text-red-600 transition-colors">Tools</a>
+          <a href="#resources" class="hover:text-red-600 transition-colors">Resources</a>
+          <a href="#evidence" class="hover:text-red-600 transition-colors">Evidence</a>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button @click="largeText = !largeText" class="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" :aria-label="largeText ? 'Decrease text size' : 'Increase text size'">
+            <span x-show="!largeText" aria-hidden="true">A+</span>
+            <span x-show="largeText" aria-hidden="true" style="display:none">A−</span>
+          </button>
+          <button @click="toggleDarkMode()" class="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" :aria-label="darkMode ? 'Switch to light mode' : 'Switch to dark mode'">
+            <span x-show="!darkMode" aria-hidden="true">🌙</span>
+            <span x-show="darkMode" aria-hidden="true" style="display:none">☀️</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Back to Top -->
+  <button x-show="showBackToTop" @click="scrollToTop()" x-transition class="fixed bottom-6 right-6 z-40 p-3 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-colors no-print" aria-label="Back to top">↑</button>
+
+  <!-- Hero -->
+  <section class="relative py-20 px-4 sm:px-6 lg:px-8 fade-in">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">Cardiovascular health, <span class="text-red-600">redesigned for aging.</span></h1>
+          <p class="text-xl text-zinc-600 dark:text-zinc-400 mb-8">Evidence-based tools and resources specifically designed for adults 65+ and their caregivers. Simple, accessible, and medically accurate.</p>
+          <div class="flex flex-wrap gap-4">
+            <button @click="scrollToSection('tools')" class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Explore Tools</button>
+            <button @click="scrollToSection('resources')" class="px-6 py-3 border border-zinc-300 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">View Resources</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section id="tools" class="py-20 px-4 sm:px-6 lg:px-8 bg-zinc-50 dark:bg-zinc-900">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center">Interactive Health Tools</h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- CV Risk Calculator -->
+        <div class="bg-white dark:bg-zinc-950 p-6 rounded-xl shadow-lg">
+          <h3 class="text-xl font-bold mb-4">CV Risk Calculator</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium mb-1">Age</label>
+              <input type="number" x-model.number="riskCalc.age" min="65" max="100" class="w-full px-3 py-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-700">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Systolic BP</label>
+              <input type="number" x-model.number="riskCalc.sbp" min="90" max="220" class="w-full px-3 py-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-700">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Total Cholesterol (mg/dL)</label>
+              <input type="number" x-model.number="riskCalc.chol" min="100" max="400" class="w-full px-3 py-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-700">
+            </div>
+            <label class="flex items-center gap-2 text-sm"><input type="checkbox" x-model="riskCalc.diabetes" class="rounded border-zinc-300"> Diabetes</label>
+            <label class="flex items-center gap-2 text-sm"><input type="checkbox" x-model="riskCalc.smoking" class="rounded border-zinc-300"> Current Smoker</label>
+            <button @click="calculateRisk()" class="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Calculate Risk</button>
+            <div x-show="riskResult !== null" x-cloak class="mt-4 p-4 bg-zinc-50 dark:bg-zinc-900 rounded-lg">
+              <p class="text-sm font-medium">10-Year CV Risk:</p>
+              <p class="text-2xl font-bold" :class="riskColor" x-text="riskResult !== null ? (riskResult + '%') : ''"></p>
+              <p class="text-xs mt-2 text-zinc-600 dark:text-zinc-400" x-text="riskMessage"></p>
+            </div>
+            <p class="text-xs text-zinc-600 dark:text-zinc-400">Illustrative score for demo only — not for clinical use.<br>
+Citation: Adapted for demo from general cardiovascular risk scoring concepts (e.g., AHA/ACC Pooled Cohort Equations, 2013).</p>
+          </div>
+        </div>
+
+        <!-- Medication Checker -->
+        <div class="bg-white dark:bg-zinc-950 p-6 rounded-xl shadow-lg">
+          <h3 class="text-xl font-bold mb-4">Medication Checker</h3>
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-2 max-h-[220px] overflow-auto p-2 rounded-md border">
+              <template x-for="m in medCatalog" :key="m.key">
+                <label class="flex items-center gap-2 text-sm">
+                  <input type="checkbox" :checked="!!selectedMeds[m.key]" @change="toggleMed(m.key)"> <span x-text="m.label"></span>
+                </label>
+              </template>
+            </div>
+            <button @click="checkMedications()" class="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Check selected meds</button>
+            <div x-show="medResults.length > 0" x-cloak class="mt-4 space-y-2">
+              <template x-for="(result,idx) in medResults" :key="idx">
+                <div class="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-sm" x-text="result"></div>
+              </template>
+            </div>
+            <p class="text-xs text-zinc-600 dark:text-zinc-400">Heuristic flags only. Confirm with a clinician/pharmacist.</p>
+          </div>
+        </div>
+
+        <!-- BP Tracker -->
+        <div class="bg-white dark:bg-zinc-950 p-6 rounded-xl shadow-lg">
+          <h3 class="text-xl font-bold mb-4">BP Tracker</h3>
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-sm font-medium mb-1">Systolic</label>
+                <input type="number" x-model.number="bpEntry.systolic" placeholder="120" class="w-full px-3 py-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-700">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Diastolic</label>
+                <input type="number" x-model.number="bpEntry.diastolic" placeholder="80" class="w-full px-3 py-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-700">
+              </div>
+            </div>
+            <button @click="addBPReading()" class="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Add Reading</button>
+            <div x-show="bpReadings.length > 0" x-cloak>
+              <div class="h-48"><canvas id="bpChart" class="mt-4"></canvas></div>
+              <div class="mt-4 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-lg">
+                <p class="text-sm font-medium">Average: <span x-text="bpAverage"></span></p>
+                <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1">Based on <span x-text="bpReadings.length"></span> readings</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Resources -->
+  <section id="resources" class="py-20 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center">Educational Resources</h2>
+      <div class="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div class="bg-white dark:bg-zinc-950 p-6 rounded-xl shadow-lg">
+          <h3 class="text-xl font-bold mb-4">Daily Tips</h3>
+          <ul class="space-y-3 text-sm">
+            <li class="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">Take your medications at the same time each day.</li>
+            <li class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">Aim for ~150 minutes of moderate activity weekly.</li>
+            <li class="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">Keep sodium under ~2300 mg/day.</li>
+          </ul>
+        </div>
+        <div class="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 p-6 rounded-xl">
+          <h3 class="text-xl font-bold mb-4 text-red-700 dark:text-red-400">Know the Warning Signs</h3>
+          <ul class="space-y-2 text-sm list-disc pl-5">
+            <li>Chest pain/pressure lasting &gt;15 minutes</li>
+            <li>Sudden shortness of breath</li>
+            <li>Sudden confusion or difficulty speaking</li>
+            <li>Sudden severe headache</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Evidence -->
+  <section id="evidence" class="py-20 px-4 sm:px-6 lg:px-8 bg-zinc-50 dark:bg-zinc-900">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center">Evidence & Research</h2>
+      <div class="bg-white dark:bg-zinc-950 p-8 rounded-xl shadow-lg text-sm">
+        <p class="opacity-80">This site provides educational information and is not a substitute for professional medical advice.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="mt-16 border-t border-zinc-200 dark:border-zinc-800">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 text-sm opacity-80 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+      <p>© <span x-text="new Date().getFullYear()"></span> CardioAging. Education only. Not medical advice.</p>
+      <div class="flex gap-4 items-center">
+        <a class="underline" href="#evidence">Evidence</a>
+        <a class="underline" href="#resources">Resources</a>
+        <a class="underline" href="#tools">Tools</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+function cardioAgingApp(){
+  return {
+    // UI state
+    darkMode: false,
+    largeText: false,
+    showBackToTop: false,
+
+    // CV Risk Calculator state
+    riskCalc: { age: 75, sbp: 130, chol: 200, diabetes: false, smoking: false },
+    riskResult: null,
+    riskMessage: '',
+    riskColor: 'text-green-600',
+
+    // Medication checker state
+    medCatalog: [
+      { label: 'Metoprolol', key: 'metoprolol', cls: 'beta' },
+      { label: 'Atenolol', key: 'atenolol', cls: 'beta' },
+      { label: 'Carvedilol', key: 'carvedilol', cls: 'beta' },
+      { label: 'Lisinopril (ACEi)', key: 'lisinopril', cls: 'acei' },
+      { label: 'Losartan (ARB)', key: 'losartan', cls: 'arb' },
+      { label: 'Valsartan (ARB)', key: 'valsartan', cls: 'arb' },
+      { label: 'Hydrochlorothiazide', key: 'hydrochlorothiazide', cls: 'thiazide' },
+      { label: 'Chlorthalidone', key: 'chlorthalidone', cls: 'thiazide' },
+      { label: 'Furosemide', key: 'furosemide', cls: 'loop' },
+      { label: 'Diltiazem (non‑DHP CCB)', key: 'diltiazem', cls: 'non-dhp' },
+      { label: 'Verapamil (non‑DHP CCB)', key: 'verapamil', cls: 'non-dhp' },
+      { label: 'Amlodipine (DHP CCB)', key: 'amlodipine', cls: 'dhp' },
+      { label: 'Doxazosin (α‑blocker)', key: 'doxazosin', cls: 'alpha' },
+      { label: 'Terazosin (α‑blocker)', key: 'terazosin', cls: 'alpha' },
+      { label: 'Atorvastatin', key: 'atorvastatin', cls: 'statin' },
+      { label: 'Pravastatin', key: 'pravastatin', cls: 'statin' },
+    ],
+    selectedMeds: {},
+    medResults: [],
+
+    // BP Tracker state
+    bpEntry: { systolic: null, diastolic: null },
+    bpReadings: [],
+    bpAverage: '—/—',
+    _bpChart: null,
+
+    init(){
+      // theme from prefers-color-scheme
+      this.darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if(this.darkMode) document.documentElement.classList.add('dark');
+
+      // back-to-top visibility
+      const onScroll = () => { this.showBackToTop = window.scrollY > 320 };
+      window.addEventListener('scroll', onScroll);
+      onScroll();
+
+      // Prepare empty chart
+      const ctx = document.getElementById('bpChart');
+      if (ctx) {
+        this._bpChart = new Chart(ctx, {
+          type: 'line',
+          data: { labels: [], datasets: [
+            { label: 'Systolic', data: [], tension: 0.3 },
+            { label: 'Diastolic', data: [], tension: 0.3 }
+          ]},
+          options: { responsive: true, maintainAspectRatio: false,
+            scales: { y: { beginAtZero: false } },
+            plugins: { legend: { display: true } }
+          }
+        });
+      }
+    },
+
+    toggleDarkMode(){ this.darkMode = !this.darkMode; document.documentElement.classList.toggle('dark', this.darkMode); },
+    scrollToTop(){ window.scrollTo({ top: 0, behavior: 'smooth' }); },
+    scrollToSection(id){ const el = document.getElementById(id); if(el) el.scrollIntoView({ behavior: 'smooth' }); },
+
+    // --- CV Risk Calculator (simplified illustrative score) ---
+    calculateRisk(){
+      const { age, sbp, chol, diabetes, smoking } = this.riskCalc;
+      if(!age || !sbp || !chol){ alert('Please enter age, SBP, and cholesterol.'); return; }
+      let score = 2;
+      score += Math.max(0, (age - 60) * 0.4);
+      score += Math.max(0, (sbp - 120) * 0.12);
+      score += Math.max(0, (chol - 160) * 0.05);
+      if (diabetes) score += 5;
+      if (smoking) score += 5;
+      score = Math.round(Math.max(1, Math.min(score, 50)));
+      this.riskResult = score;
+      this.riskMessage = score < 10 ? 'Low estimated risk (illustrative only).'
+                        : score < 20 ? 'Borderline to intermediate risk.'
+                        : 'Higher estimated risk; discuss with a clinician.';
+      this.riskColor = score < 10 ? 'text-green-600' : score < 20 ? 'text-amber-600' : 'text-red-600';
+    },
+
+    // --- Medication Checker ---
+    toggleMed(key){ this.selectedMeds[key] = !this.selectedMeds[key]; },
+    checkMedications(){
+      const chosen = this.medCatalog.filter(m => this.selectedMeds[m.key]);
+      const byClass = {};
+      chosen.forEach(m => byClass[m.cls] = (byClass[m.cls] || 0) + 1);
+      const flags = [];
+      if ((byClass['beta'] || 0) >= 2) flags.push('Possible duplicate beta‑blocker therapy.');
+      if ((byClass['acei'] || 0) > 0 && (byClass['arb'] || 0) > 0) flags.push('ACE inhibitor + ARB together is usually avoided.');
+      if ((byClass['thiazide'] || 0) > 0 && (byClass['loop'] || 0) > 0) flags.push('Thiazide + loop diuretic — review necessity/volume status.');
+      if ((byClass['alpha'] || 0) > 0) flags.push('α‑blocker present — discuss fall‑risk/orthostasis.');
+      if ((byClass['beta'] || 0) > 0 && (byClass['non-dhp'] || 0) > 0) flags.push('Beta‑blocker + non‑DHP CCB (brady/low BP).');
+      this.medResults = flags.length ? flags : ['No issues flagged by simple rules. Confirm with a clinician.'];
+    },
+
+    // --- BP Tracker ---
+    addBPReading(){
+      const s = Number(this.bpEntry.systolic), d = Number(this.bpEntry.diastolic);
+      if(!s || !d){ alert('Please enter both systolic and diastolic values.'); return; }
+      const label = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      this.bpReadings.push({ s, d, label });
+      const avgS = Math.round(this.bpReadings.reduce((a,r)=>a+r.s,0) / this.bpReadings.length);
+      const avgD = Math.round(this.bpReadings.reduce((a,r)=>a+r.d,0) / this.bpReadings.length);
+      this.bpAverage = `${avgS}/${avgD}`;
+      if(this._bpChart){
+        this._bpChart.data.labels.push(label);
+        this._bpChart.data.datasets[0].data.push(s);
+        this._bpChart.data.datasets[1].data.push(d);
+        this._bpChart.update();
+      }
+      this.bpEntry = { systolic: null, diastolic: null };
+    },
+  }
+}
+</script>
+</body>
+</html>
